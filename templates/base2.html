@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>{{title}}</title>
+
+</head>
+<body>
+    <h1>Миссия Колонизация Марса</h1>
+    <h4>И на Марсе будут яблони цвести!</h4>
+    {% if pict == 'inz.jpg' %}
+        <p align="center">Инженерные тренажеры</p>
+    {% else %}
+        <p align="center">Научные тренажеры</p>
+    {% endif %}
+    <img src={{location}}>
+</body>
+</html>
