@@ -28,7 +28,7 @@ def main():
     return redirect('/')
 
 
-@app.route('/register',methods=['GET', 'POST'])
+@app.route('/register', methods=['GET', 'POST'])
 def register():
     form = RegistrationForm()
     if form.validate_on_submit():
@@ -112,41 +112,56 @@ def add_jobs():
                            form=form, style=url_for('static', filename='css/style.css'))
 
 
-"""
-@app.route('/news/<int:id>', methods=['GET', 'POST'])
+@app.route('/jobs/<int:id>', methods=['GET', 'POST'])
 @login_required
 def edit_news(id):
-    form = NewsForm()
+    form = JobsForm()
     if request.method == "GET":
+        jobs = []
         db_sess = db_session.create_session()
-        news = db_sess.query(News).filter(News.id == id,
-                                          News.user == current_user
-                                          ).first()
-        if news:
-            form.title.data = news.title
-            form.content.data = news.content
-            form.is_private.data = news.is_private
+        jobs.append(db_sess.query(Jobs).filter(Jobs.id == id,
+                                               Jobs.team_leader == current_user.id
+                                               ).first())
+        if current_user.id == 1:
+            jobs.append(db_sess.query(Jobs).filter(Jobs.id == id).first())
+        print(jobs)
+        jobs = jobs[-1]
+        if jobs:
+            form.job.data = jobs.job
+            form.team_leader.data = jobs.team_leader
+            form.work_size.data = jobs.work_size
+            form.collaborators.data = jobs.collaborators
+            form.start_date.data = jobs.start_date
+            form.end_date.data = jobs.end_date
+            form.is_finished.data = jobs.is_finished
         else:
             abort(404)
     if form.validate_on_submit():
         db_sess = db_session.create_session()
-        news = db_sess.query(News).filter(News.id == id,
-                                          News.user == current_user
-                                          ).first()
-        if news:
-            news.title = form.title.data
-            news.content = form.content.data
-            news.is_private = form.is_private.data
+        jobs = []
+        jobs.append(db_sess.query(Jobs).filter(Jobs.id == id,
+                                               Jobs.team_leader == current_user.id
+                                               ).first())
+        if current_user.id == 1:
+            jobs.append(db_sess.query(Jobs).filter(Jobs.id == id).first())
+        jobs = jobs[-1]
+        if jobs:
+            jobs.job = form.job.data
+            jobs.team_leader = form.team_leader.data
+            jobs.work_size = form.work_size.data
+            jobs.collaborators = form.collaborators.data
+            jobs.start_date = form.start_date.data
+            jobs.end_date = form.end_date.data
+            jobs.is_finished = form.is_finished.data
             db_sess.commit()
             return redirect('/')
         else:
             abort(404)
     return render_template('jobs.html',
-                           title='Редактирование новости',
-                           form=form
-                           )
+                           form=form, style=url_for('static', filename='css/style.css'))
 
 
+"""
 @app.route('/news_delete/<int:id>', methods=['GET', 'POST'])
 @login_required
 def news_delete(id):
