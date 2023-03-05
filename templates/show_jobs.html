@@ -15,5 +15,9 @@
             {% endif %}
         </tr>
     </table>
+    {% if current_user.is_authenticated and (current_user.id == i.team_leader or current_user.id == 1)%}
+    <button href=/job_delete/{{i.id}} color="red">Удалить работу</button>
+    <button href=/jobs/{{i.id}} color="green">Редактировать работу</button>
+    {% endif %}
 {% endfor %}
 {% endblock %}
