@@ -161,21 +161,24 @@ def edit_news(id):
                            form=form, style=url_for('static', filename='css/style.css'))
 
 
-"""
-@app.route('/news_delete/<int:id>', methods=['GET', 'POST'])
+@app.route('/job_delete/<int:id>', methods=['GET', 'POST'])
 @login_required
-def news_delete(id):
+def job_delete(id):
     db_sess = db_session.create_session()
-    news = db_sess.query(News).filter(News.id == id,
-                                      News.author == current_user
-                                      ).first()
-    if news:
-        db_sess.delete(news)
+    jobs = []
+    jobs.append(db_sess.query(Jobs).filter(Jobs.id == id,
+                                           Jobs.team_leader == current_user.id
+                                           ).first())
+    if current_user.id == 1:
+        jobs.append(db_sess.query(Jobs).filter(Jobs.id == id).first())
+    jobs = jobs[-1]
+    if jobs:
+        db_sess.delete(jobs)
         db_sess.commit()
     else:
         abort(404)
     return redirect('/')
-"""
+
 
 if __name__ == '__main__':
     app.run()
