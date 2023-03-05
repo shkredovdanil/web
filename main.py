@@ -1,12 +1,12 @@
-from flask import Flask, render_template, redirect, request, abort
+import datetime
+from flask import Flask, render_template, redirect, request, abort, url_for
 from data import db_session
 from data.users import User
 from data.jobs import Jobs
 from flask_login import LoginManager
 from flask_login import login_user, logout_user, login_required, current_user
-from flask_wtf import FlaskForm
-from wtforms import StringField, PasswordField, BooleanField, SubmitField, EmailField
-from wtforms.validators import DataRequired
+from forms.login import LoginForm
+from forms.registration_form import RegistrationForm
 from forms.jobs import JobsForm
 
 app = Flask(__name__)
@@ -23,16 +23,32 @@ def load_user(user_id):
     return db_sess.query(User).get(user_id)
 
 
-class LoginForm(FlaskForm):
-    email = EmailField('Почта', validators=[DataRequired()])
-    password = PasswordField('Пароль', validators=[DataRequired()])
-    remember_me = BooleanField('Запомнить меня')
-    submit = SubmitField('Войти')
-
-
 @app.route('/success')
 def main():
     return redirect('/')
+
+
+@app.route('/register',methods=['GET', 'POST'])
+def register():
+    form = RegistrationForm()
+    if form.validate_on_submit():
+        db_session.global_init('db/mars_explorer.db')
+        db_sess = db_session.create_session()
+        user = User()
+        user.surname = form.surname.data
+        user.name = form.name.data
+        user.age = form.age.data
+        user.position = form.position.data
+        user.speciality = form.speciality.data
+        user.address = form.address.data
+        user.email = form.email.data
+        user.hashed_password = form.password.data
+        user.modified_date = datetime.datetime.now()
+        db_sess.add(user)
+        db_sess.commit()
+        return redirect('/login')
+    return render_template('register.html',
+                           form=form, style=url_for('static', filename='css/style.css'))
 
 
 @app.route('/login', methods=['GET', 'POST'])
@@ -49,7 +65,8 @@ def login():
         return render_template('login.html',
                                message="Неправильный логин или пароль",
                                form=form)
-    return render_template('login.html', title='Авторизация в системе Mars One', form=form)
+    return render_template('login.html', style=url_for('static', filename='css/style.css'),
+                           form=form)
 
 
 @app.route('/logout')
@@ -63,11 +80,14 @@ def logout():
 def list_of_jobs():
     db_session.global_init('db/mars_explorer.db')
     db_sess = db_session.create_session()
-    jobs = db_sess.query(Jobs).filter(Jobs.team_leader == current_user.id).all()
+    jobs = db_sess.query(Jobs).all()
     print(jobs, current_user.id)
+    names = {}
     for i in jobs:
-        print(i.job)
-    return render_template('show_jobs.html', jobs=jobs)
+        names[i] = db_sess.query(User).filter(i.team_leader == User.id).first()
+    for i in jobs:
+        print(i.is_finished)
+    return render_template('show_jobs.html', jobs=jobs, names=names, style=url_for('static', filename='css/style.css'))
 
 
 @app.route('/jobs', methods=['GET', 'POST'])
@@ -88,8 +108,9 @@ def add_jobs():
         db_sess.merge(current_user)
         db_sess.commit()
         return redirect('/')
-    return render_template('jobs.html', title='Добавление новости',
-                           form=form)
+    return render_template('jobs.html',
+                           form=form, style=url_for('static', filename='css/style.css'))
+
 
 """
 @app.route('/news/<int:id>', methods=['GET', 'POST'])

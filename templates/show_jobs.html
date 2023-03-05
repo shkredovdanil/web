@@ -1,6 +1,19 @@
 {% extends "base.html" %}
 {% block content %}
+<h1 align="center">Список работ</h1>
 {% for i in jobs %}
-    <h1>{{i.job}}</h1>
+    <h2>Работа № {{loop.index}}</h2>
+    <table>
+        <tr>
+            <th>Работа</th><th>Руководитель</th><th>Время выполнения</th><th>Работники</th><th>Закончена</th></br>
+        </tr>
+        <tr>
+            {% if i.is_finished %}
+            <td>{{i.job}}</td><td>{{names[i].name}} {{names[i].surname}}</td><td>{{i.work_size}}</td><td>{{i.collaborators}}</td><td>Закончена</td>
+            {% else %}
+            <td>{{i.job}}</td><td>{{names[i].name}} {{names[i].surname}}</td><td>{{i.work_size}}</td><td>{{i.collaborators}}</td><td>Не закончена</td>
+            {% endif %}
+        </tr>
+    </table>
 {% endfor %}
 {% endblock %}

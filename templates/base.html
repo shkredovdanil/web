@@ -5,18 +5,24 @@
     <link href={{ style }} rel="stylesheet">
     <nav>
         {% if current_user.is_authenticated %}
-            <a class="navbar-brand" href="/logout">{{ current_user.name }}</a>
+            <a class="navbar-brand" href="/logout"><h2>{{ current_user.name }}</h2></a>
         {% else %}
         <p>
-            <a class="btn btn-primary " href="/register">Зарегистрироваться</a>
-            <a class="btn btn-success" href="/login">Войти</a>
+            <a class="btn btn-primary" href="/register"><h2>Зарегистрироваться</h2></a>
+            <a class="btn btn-primary" href="/login"><h2>Войти</h2></a>
         </p>
-        {% endif %}</nav>
+        {% endif %}
+
+    </nav>
     {% if current_user.is_authenticated %}
         <a href="/jobs" class="btn btn-secondary">Добавить работу</a>
     {% endif %}
+    <h3>MARS ONE</h3>
 </head>
 <body>
+<header>
+        <h1>Миссия колонизация Марса</h1>
+</header>
     {% block content %}{% endblock %}
 </body>
 </html>
